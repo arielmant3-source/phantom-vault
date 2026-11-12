@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#050507">
+<title>PHANTOM VAULT</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="../logo.svg"><link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="vault.css">
+</head><body>
+<div id="bg"></div>
+
+<!-- SETUP -->
+<section id="setup" class="screen" hidden>
+  <div class="center">
+    <div class="logo pulse"><img src="../logo.svg" alt=""></div>
+    <h1 class="mono">PHANTOM VAULT</h1>
+    <p class="dim" id="setupMsg">בחר קוד סודי (4–12 ספרות)</p>
+    <div class="dots" id="setupDots"></div>
+    <p class="warn">אין שחזור לקוד. אם שוכחים אותו – הקבצים אבודים.</p>
+  </div>
+  <div class="pad" data-target="setup"></div>
+  <button class="link" id="setupOk" hidden>המשך</button>
+</section>
+
+<!-- LOCK -->
+<section id="lock" class="screen" hidden>
+  <div class="center">
+    <div class="logo pulse"><img src="../logo.svg" alt=""></div>
+    <h1 class="mono">PHANTOM VAULT</h1>
+    <p class="dim" id="lockMsg">הזן קוד גישה</p>
+    <div class="dots" id="lockDots"></div>
+  </div>
+  <div class="pad" data-target="lock"></div>
+</section>
+
+<!-- MAIN -->
+<section id="main" class="screen" hidden>
+  <header>
+    <img src="../logo.svg" alt="" class="hlogo">
+    <div class="grow"><div class="mono small">PHANTOM VAULT</div><div class="dim tiny" id="tabTitle">אפליקציות</div></div>
+    <button class="icon" id="lockBtn" title="נעל עכשיו">🔒</button>
+  </header>
+
+  <div class="tab" id="tab-apps">
+    <div class="card glow">
+      <h3>לוח האפליקציות שלך</h3>
+      <p class="dim tiny">כפתורים לפתיחה מהירה. אם האפליקציה מותקנת, הקישור בדרך כלל נפתח בה – אחרת נפתח האתר שלה.
+      אתר לא יכול להסתיר אפליקציות בטלפון, אבל הרשימה עצמה שמורה מוצפנת.</p>
+      <button class="btn" id="addAppBtn">＋ הוסף אפליקציה</button>
+    </div>
+    <div class="grid" id="appsGrid"></div>
+  </div>
+
+  <div class="tab" id="tab-files" hidden>
+    <div class="card glow">
+      <h3 id="filesCount">0 פריטים מוצפנים</h3>
+      <p class="dim tiny">התמונות והקבצים מוצפנים (AES-256-GCM) ונשמרים רק בדפדפן הזה בטלפון הזה.</p>
+      <label class="btn">⬆ הוסף תמונות וקבצים<input type="file" id="fileInput" multiple hidden></label>
+    </div>
+    <div class="grid files" id="filesGrid"></div>
+  </div>
+
+  <div class="tab" id="tab-notes" hidden>
+    <div class="card glow">
+      <h3>פתקים פרטיים</h3>
+      <button class="btn" id="newNoteBtn">＋ פתק חדש</button>
+    </div>
+    <div id="notesList"></div>
+  </div>
+
+  <div class="tab" id="tab-settings" hidden>
+    <div class="card">
+      <h3>אבטחה</h3>
+      <div class="row"><span class="grow">שינוי קוד</span><button class="small-btn" id="changePinBtn">שנה</button></div>
+      <div class="row"><span class="grow">נעילה אוטומטית ביציאה</span>
+        <select id="autoLock"><option value="0">מיד</option><option value="30">30 שנ׳</option><option value="60">דקה</option><option value="300">5 דק׳</option></select></div>
+      <div class="row"><span class="grow">נעל עכשיו</span><button class="small-btn" id="lockBtn2">נעל</button></div>
+    </div>
+    <div class="card">
+      <h3>התקנה כאפליקציית רשת</h3>
+      <p class="dim tiny">ב-Chrome: ⋮ ← "הוסף למסך הבית". הכספת תיפתח במסך מלא ותעבוד גם בלי אינטרנט.</p>
+    </div>
+    <div class="card">
+      <h3>חשוב לדעת</h3>
+      <p class="dim tiny">• הכל נשמר רק בדפדפן הזה. "ניקוי נתוני אתרים" ב-Chrome מוחק את הכספת.<br>
+      • כדאי לגבות קבצים חשובים (פתח קובץ ← הורד).<br>
+      • אין שרת: שום דבר לא נשלח לאינטרנט.</p>
+    </div>
+    <div class="card">
+      <h3 class="red">אזור מסוכן</h3>
+      <div class="row"><span class="grow">מחיקת הכספת וכל התוכן</span><button class="small-btn red" id="wipeBtn">מחק</button></div>
+    </div>
+    <p class="dim tiny center-text">PHANTOM VAULT Web 1.0 · AES-256-GCM · PBKDF2-SHA256</p>
+  </div>
+
+  <nav>
+    <button data-tab="apps" class="on"><span>▦</span>אפליקציות</button>
+    <button data-tab="files"><span>🗀</span>קבצים</button>
+    <button data-tab="notes"><span>✎</span>פתקים</button>
+    <button data-tab="settings"><span>⚙</span>הגדרות</button>
+  </nav>
+</section>
+
+<!-- overlays -->
+<div id="modal" class="modal" hidden><div class="sheet" id="sheet"></div></div>
+<div id="viewer" class="viewer" hidden><div class="vbar"><button class="icon" id="vClose">✕</button><span id="vName" class="grow"></span><button class="small-btn" id="vDownload">הורד</button><button class="small-btn red" id="vDelete">מחק</button></div><div id="vBody"></div></div>
+<div id="toast" class="toast" hidden></div>
+<div id="busy" class="busy" hidden><div class="card glow"><div class="spinner"></div><span id="busyMsg"></span></div></div>
+
+<script src="vault.js"></script>
+</body></html>
