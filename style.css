@@ -1,0 +1,25 @@
+:root{--bg:#050507;--p:#a855f7;--v:#7c3aed;--m:#e879f9;--t:#f4f0fa;--d:#a79db8;--b:rgba(168,85,247,.28)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--t);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh;line-height:1.55;
+background-image:radial-gradient(circle at 15% 8%,rgba(109,40,217,.45),transparent 55%),radial-gradient(circle at 90% 85%,rgba(232,121,249,.16),transparent 50%);background-attachment:fixed}
+main{max-width:600px;margin:0 auto;padding:32px 16px 48px}
+.logo{width:96px;height:96px;margin:8px auto 14px;display:block;filter:drop-shadow(0 0 24px rgba(168,85,247,.6))}
+h1{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:6px;text-align:center;font-size:24px}
+.tag{color:var(--d);text-align:center;margin:4px 0 26px}
+h2{font-size:17px;margin:26px 0 10px;color:var(--p)}
+.card{background:linear-gradient(180deg,rgba(22,16,34,.85),rgba(11,8,17,.85));border:1px solid var(--b);border-radius:20px;padding:18px;margin-bottom:12px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;height:54px;border-radius:16px;font-weight:700;font-size:17px;color:#fff;text-decoration:none;
+background:linear-gradient(90deg,var(--v),var(--p),var(--m));box-shadow:0 0 28px rgba(168,85,247,.35)}
+.btn:active{transform:scale(.98)}
+.meta{color:var(--d);font-size:12px;text-align:center;margin-top:8px;word-break:break-all}
+ol{padding-inline-start:20px}ol li{margin:6px 0}
+.small{color:var(--d);font-size:13px}
+code{background:rgba(168,85,247,.14);padding:1px 6px;border-radius:6px;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:14px}
+.tile{display:flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;color:var(--t);padding:14px 6px;border-radius:20px;
+background:linear-gradient(180deg,rgba(22,16,34,.85),rgba(11,8,17,.85));border:1px solid var(--b);transition:transform .15s,box-shadow .15s}
+.tile:active{transform:scale(.94);box-shadow:0 0 22px rgba(168,85,247,.45)}
+.ic{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#e9d5ff;
+background:linear-gradient(135deg,rgba(168,85,247,.35),rgba(109,40,217,.15));border:1px solid rgba(168,85,247,.35)}
+.nm{font-size:12px;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+footer{margin-top:30px;color:var(--d);font-size:11px;text-align:center}

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#050507">
+<title>PHANTOM VAULT</title><link rel="icon" href="logo.svg"><link rel="stylesheet" href="style.css">
+</head><body><main>
+<img class="logo" src="logo.svg" alt="">
+<h1>PHANTOM VAULT</h1>
+<p class="tag">כספת האפליקציות הסודית שלך</p>
+
+<div class="card">
+  <a class="btn" href="PhantomVault.apk" download>⬇ הורד את האפליקציה</a>
+  <p class="meta">גרסה <span id="ver">1.3.0</span> · Android 9 ומעלה<br>SHA-256: <span id="sha">—</span></p>
+</div>
+
+<h2>התקנה</h2>
+<div class="card"><ol>
+  <li>לחץ "הורד את האפליקציה" ואשר את ההורדה.</li>
+  <li>פתח את הקובץ שירד (מההתראה או מאפליקציית "הקבצים שלי").</li>
+  <li>אם מופיע "התקנה ממקורות לא ידועים" – הקש "הגדרות" ← אפשר לאפליקציה הזו ← חזור.</li>
+  <li>Samsung: אם מופיע חסימה של <b>Auto Blocker</b> – הגדרות ← אבטחה ופרטיות ← Auto Blocker ← כבה זמנית.</li>
+  <li>הקש "התקן", פתח את PHANTOM VAULT ובחר קוד סודי.</li>
+</ol>
+<p class="small">עדכון: מורידים מכאן שוב ומתקינים מעל – הנתונים נשמרים.</p></div>
+
+<h2>האתר האישי שלך</h2>
+<div class="card"><p class="small">בכספת: אפליקציות ← אתר פורטל ← <b>העתק קישור אישי</b>.
+הקישור מוביל לדף <code>portal.html</code> באתר הזה עם הכפתורים שלך. רשימת האפליקציות נמצאת רק בתוך הקישור עצמו (אחרי הסימן #),
+ולכן אינה נשלחת לשרת ואינה נשמרת בו.</p></div>
+
+<footer>PHANTOM VAULT</footer>
+</main>
+<script>
+fetch('version.json',{cache:'no-store'}).then(r=>r.json()).then(j=>{document.getElementById('ver').textContent=j.version;document.getElementById('sha').textContent=j.sha256}).catch(()=>{});
+</script>
+</body></html>
