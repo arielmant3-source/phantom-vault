@@ -1,42 +1,531 @@
 <!doctype html>
-<html lang="he" dir="rtl"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#050507">
-<title>PHANTOM VAULT</title><link rel="icon" href="logo.svg"><link rel="stylesheet" href="style.css">
-</head><body><main>
-<img class="logo" src="logo.svg" alt="">
-<h1>PHANTOM VAULT</h1>
-<p class="tag">כספת האפליקציות הסודית שלך</p>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PHANTOM VAULT</title>
+<meta name="description" content="כספת פרטית מוצפנת לאפליקציות, קבצים ופתקים, ומעבדה כנה שמראה מה Family Link רואה.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#060508">
+<link rel="icon" href="logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="scrollcraft.css">
+<style>
+:root {
+  --sc-canvas: #060508;
+  --sc-surface: #100c17;
+  --sc-ink: #f2eef8;
+  --sc-ink-soft: #a89fb8;
+  --sc-accent: #9d63ff;
+  --sc-accent-ink: #0b0712;
+  --sc-font-display: "Frank Ruhl Libre", "Heebo", serif;
+  --sc-font-text: "Heebo", system-ui, sans-serif;
+  --sc-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --pv-violet-deep: #2a1250;
+  --pv-ok: #7fd6a8;
+  --pv-warn: #f0b860;
+  --pv-no: #ff7a8a;
+  --gut: clamp(16px, 4vw, 56px);
+}
+html { background: var(--sc-canvas); }
+body { background: var(--sc-canvas); color: var(--sc-ink); font-family: var(--sc-font-text); margin: 0; overflow-x: hidden; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 3px; border-radius: 4px; }
+.mono { font-family: var(--sc-font-mono); letter-spacing: 0.02em; }
+.ltr { direction: ltr; unicode-bidi: isolate; }
 
-<div class="card">
-  <a class="btn" href="app/">🔐 פתח את הכספת באתר</a>
-  <p class="meta">עובד ישר מהדפדפן, בלי התקנה. אפשר להוסיף למסך הבית: ⋮ ← "הוסף למסך הבית"</p>
-</div>
+/* ---------- bar ---------- */
+.bar { position: fixed; inset: 0 0 auto 0; z-index: 50; display: flex; align-items: center; justify-content: space-between;
+  padding: 14px var(--gut); background: linear-gradient(to bottom, rgba(6,5,8,.82), rgba(6,5,8,0)); }
+.bar__mark { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--sc-font-mono); font-size: .8rem; letter-spacing: .18em; }
+.bar__mark img { width: 26px; height: 26px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; border-radius: 999px; text-decoration: none;
+  font-weight: 700; font-size: .95rem; background: var(--sc-accent); color: var(--sc-accent-ink);
+  box-shadow: 0 6px 20px -8px rgba(157,99,255,.7); transition: transform .2s, background-color .2s; border: 0; cursor: pointer; font-family: inherit; }
+.btn:hover { background: #b285ff; }
+.btn--ghost { background: transparent; color: var(--sc-ink); border: 1px solid var(--sc-hairline-strong); box-shadow: none; }
+.btn--ghost:hover { background: rgba(157,99,255,.12); }
+.bar .btn { min-height: 38px; padding: 0 16px; font-size: .85rem; }
 
-<div class="card">
-  <a class="btn" href="PhantomVault.apk" download>⬇ הורד את אפליקציית Android</a>
-  <p class="meta">גרסה <span id="ver">1.3.0</span> · Android 9 ומעלה<br>SHA-256: <span id="sha">—</span></p>
-</div>
+/* ---------- 1 hero ---------- */
+.hero > [data-sc-stage] { overflow: hidden; }
+.hero__plane { position: absolute; inset: 0; pointer-events: none; }
+.hero__grid { inset: -10% -5% -40%;
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 42%, rgba(124,64,230,.34), transparent 70%),
+    radial-gradient(ellipse 35% 30% at 18% 80%, rgba(90,30,170,.22), transparent 70%),
+    linear-gradient(rgba(157,99,255,.07) 1px, transparent 1px) 0 0/48px 48px,
+    linear-gradient(90deg, rgba(157,99,255,.07) 1px, transparent 1px) 0 0/48px 48px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, #000 40%, transparent 85%); }
+.hero__door { position: absolute; left: 50%; top: 46%; width: min(78vh, 86vw); aspect-ratio: 1; translate: -50% -50%;
+  transform: scale(calc(0.92 + var(--sc-p, 0) * 0.5)); opacity: calc(1 - var(--sc-p, 0) * 0.55); }
+.hero__door svg { width: 100%; height: 100%; overflow: visible; }
+.ring-a { transform-origin: 300px 300px; transform: rotate(calc(var(--sc-p, 0) * 120deg)); }
+.ring-b { transform-origin: 300px 300px; transform: rotate(calc(var(--sc-p, 0) * -200deg)); }
+.ring-c { transform-origin: 300px 300px; transform: rotate(calc(var(--sc-p, 0) * 300deg)); }
+.hero__gate { inset: 0 -10%; display: flex; justify-content: space-between; }
+.hero__gate i { display: block; width: clamp(28px, 6vw, 90px); height: 140%;
+  background: linear-gradient(90deg, #050407, #140d22 40%, #0a0710); border-inline: 1px solid rgba(157,99,255,.18);
+  transform: translateX(calc(var(--sc-p, 0) * var(--dir) * 30vw)); }
+.hero__gate i:nth-child(1) { --dir: -1; } .hero__gate i:nth-child(2) { --dir: 1; }
+.hero__fog { inset: auto 0 0 0; height: 45%; background: linear-gradient(to top, var(--sc-canvas) 10%, rgba(6,5,8,0)); }
+.hero__copy { position: absolute; z-index: 3; inset-inline: var(--gut); bottom: clamp(56px, 13vh, 140px); max-width: 900px; }
+.hero__copy h1 { font-family: var(--sc-font-mono); font-weight: 500; letter-spacing: .32em; font-size: clamp(.8rem, .7rem + .5vw, 1.05rem); color: var(--sc-ink-soft); margin: 0 0 18px; }
+.hero__copy p.big { font-family: var(--sc-font-display); font-weight: 900; font-size: clamp(2.6rem, 1.4rem + 6vw, 7rem); line-height: .98; margin: 0; letter-spacing: -0.01em; text-shadow: 0 4px 30px rgba(6,5,8,.8); }
+.hero__beat { position: absolute; z-index: 3; inset-inline-end: var(--gut); top: 22vh; max-width: 30ch; font-size: var(--sc-t-lg); line-height: 1.5;
+  padding: 18px 22px; background: rgba(10,7,16,.72); border: 1px solid var(--sc-hairline); border-radius: 14px; backdrop-filter: blur(6px); }
+.hero__beat b { color: var(--sc-accent); }
 
-<h2>התקנה</h2>
-<div class="card"><ol>
-  <li>לחץ "הורד את האפליקציה" ואשר את ההורדה.</li>
-  <li>פתח את הקובץ שירד (מההתראה או מאפליקציית "הקבצים שלי").</li>
-  <li>אם מופיע "התקנה ממקורות לא ידועים" – הקש "הגדרות" ← אפשר לאפליקציה הזו ← חזור.</li>
-  <li>Samsung: אם מופיע חסימה של <b>Auto Blocker</b> – הגדרות ← אבטחה ופרטיות ← Auto Blocker ← כבה זמנית.</li>
-  <li>הקש "התקן", פתח את PHANTOM VAULT ובחר קוד סודי.</li>
-</ol>
-<p class="small">עדכון: מורידים מכאן שוב ומתקינים מעל – הנתונים נשמרים.</p></div>
+/* ---------- 2 contents ---------- */
+.contents { padding: clamp(24px, 4vh, 48px) var(--gut) clamp(48px, 8vh, 96px); max-width: 1240px; margin: 0 auto; }
+.contents h2 { font-family: var(--sc-font-display); font-size: var(--sc-t-3xl); line-height: 1.02; margin: 0 0 14px; max-width: 14ch; }
+.contents > p { color: var(--sc-ink-soft); max-width: 56ch; font-size: var(--sc-t-lg); margin: 0 0 56px; }
+.feat { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; }
+.feat article { background: var(--sc-surface); border: 1px solid var(--sc-hairline); border-radius: 18px; padding: 26px; position: relative; overflow: hidden; }
+.feat article:nth-child(1) { grid-column: span 7; } .feat article:nth-child(2) { grid-column: span 5; }
+.feat article:nth-child(3) { grid-column: span 5; } .feat article:nth-child(4) { grid-column: span 7; }
+.feat h3 { font-size: var(--sc-t-xl); margin: 8px 0 8px; font-family: var(--sc-font-display); }
+.feat p { color: var(--sc-ink-soft); margin: 0; line-height: 1.6; }
+.feat .tag { font-family: var(--sc-font-mono); font-size: .72rem; color: var(--sc-accent); letter-spacing: .12em; }
+.feat article::before { content: ""; position: absolute; inset: -40% -20% auto auto; width: 60%; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle, rgba(157,99,255,.16), transparent 65%); }
+.feat .honest { margin-top: 14px; font-size: .85rem; color: var(--pv-warn); }
 
-<h2>האתר האישי שלך</h2>
-<div class="card"><p class="small">בכספת: אפליקציות ← אתר פורטל ← <b>העתק קישור אישי</b>.
-הקישור מוביל לדף <code>portal.html</code> באתר הזה עם הכפתורים שלך. רשימת האפליקציות נמצאת רק בתוך הקישור עצמו (אחרי הסימן #),
-ולכן אינה נשלחת לשרת ואינה נשמרת בו.</p></div>
+/* ---------- 3 argument ---------- */
+.arg { display: grid; place-items: center; padding: 0 var(--gut);
+  background: radial-gradient(ellipse 50% 40% at 70% 50%, rgba(80,30,150,.25), transparent 70%); }
+.arg__stack { display: grid; width: min(1100px, 100%); }
+.arg__stack > * { grid-area: 1/1; align-self: center; margin: 0; }
+.arg__line { font-family: var(--sc-font-display); font-weight: 700; font-size: var(--sc-t-3xl); line-height: 1.08; max-width: 18ch; }
+.arg__line:nth-child(2) { justify-self: end; text-align: left; }
+.arg__line em { font-style: normal; color: var(--sc-accent); }
+.arg__last { font-size: var(--sc-t-2xl); font-family: var(--sc-font-display); font-weight: 700; max-width: 24ch; justify-self: center; text-align: center; }
 
-<footer>PHANTOM VAULT</footer>
+/* ---------- 4 options ---------- */
+.opts { padding: clamp(96px, 14vh, 160px) var(--gut); max-width: 1240px; margin: 0 auto; }
+.opts header { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: end; margin-bottom: 40px; }
+.opts h2 { font-family: var(--sc-font-display); font-size: var(--sc-t-3xl); line-height: 1.02; margin: 0; }
+.opts header p { color: var(--sc-ink-soft); margin: 0; line-height: 1.6; }
+.opt { display: grid; grid-template-columns: 1.1fr 1.6fr 1.3fr; gap: 24px; padding: 26px 0; border-top: 1px solid var(--sc-hairline); align-items: start; }
+.opt:last-child { border-bottom: 1px solid var(--sc-hairline); }
+.opt h3 { margin: 0; font-size: var(--sc-t-lg); }
+.opt h3 small { display: block; font-family: var(--sc-font-mono); font-weight: 400; font-size: .72rem; color: var(--sc-ink-soft); margin-top: 6px; letter-spacing: .06em; }
+.opt p { margin: 0; color: var(--sc-ink-soft); line-height: 1.6; }
+.verdict { display: grid; gap: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 8px; width: fit-content; font-size: .8rem; padding: 5px 12px; border-radius: 999px; border: 1px solid currentColor; font-weight: 500; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip--ok { color: var(--pv-ok); } .chip--warn { color: var(--pv-warn); } .chip--no { color: var(--pv-no); } .chip--un { color: var(--sc-ink-soft); }
+.verdict span.src { font-size: .78rem; color: var(--sc-ink-soft); }
+
+/* ---------- 5 lab (peak) ---------- */
+.lab { background: radial-gradient(ellipse 70% 60% at 30% 50%, #150b28, var(--sc-canvas) 70%); }
+.lab__inner { height: 100%; display: grid; grid-template-columns: minmax(260px, 360px) 1fr; gap: clamp(24px, 5vw, 80px);
+  align-items: center; padding: 76px var(--gut) 24px; grid-template-rows: auto 1fr auto; row-gap: 18px; max-width: 1280px; margin: 0 auto; box-sizing: border-box; }
+.lab__head { grid-column: 1 / -1; align-self: end; }
+.lab__head h2 { font-family: var(--sc-font-display); font-size: var(--sc-t-xl); margin: 0 0 4px; }
+.lab__head p { margin: 0; color: var(--sc-ink-soft); }
+.modes { display: inline-flex; gap: 4px; padding: 4px; margin-top: 14px; border: 1px solid var(--sc-hairline-strong); border-radius: 999px; background: rgba(16,12,23,.8); }
+.modes button { min-height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent; color: var(--sc-ink-soft); font: inherit; font-size: .88rem; cursor: pointer; }
+.modes button[aria-pressed="true"] { background: var(--sc-accent); color: var(--sc-accent-ink); font-weight: 700; }
+.phone { position: relative; aspect-ratio: 9 / 18.5; max-height: 52vh; width: 100%; justify-self: center; border-radius: 38px; padding: 12px;
+  background: #0c0914; border: 1px solid rgba(157,99,255,.3); box-shadow: 0 30px 80px -30px rgba(80,30,160,.6), inset 0 0 0 6px #07050b; box-sizing: border-box; }
+.phone__screen { position: relative; height: 100%; border-radius: 28px; overflow: hidden; background: #0a0810; display: grid; grid-template-rows: repeat(5, 1fr); }
+.layer { position: relative; border-bottom: 1px dashed rgba(157,99,255,.18); padding: 8px 12px; display: flex; flex-direction: column; justify-content: center; gap: 6px; transition: background-color .3s; }
+.layer__name { font-family: var(--sc-font-mono); font-size: .64rem; color: var(--sc-ink-soft); letter-spacing: .04em; }
+.layer__apps { display: flex; gap: 6px; flex-wrap: wrap; }
+.app { width: 22px; height: 22px; border-radius: 7px; background: #241b36; transition: opacity .35s, transform .35s; }
+.app--p { background: var(--sc-accent); }
+.layer.hit { background: rgba(157,99,255,.1); }
+.layer.hit .app--p { outline: 2px solid #fff; outline-offset: 2px; }
+.phone[data-mode="hide"] .layer--ui .app--p { opacity: 0; transform: scale(.4); }
+.phone[data-mode="isolate"] .app--p { opacity: .35; }
+.beam { position: absolute; inset-inline: 0; height: 2px; top: calc(var(--beam, 0) * 100%); background: #c9a8ff;
+  box-shadow: 0 -16px 28px 8px rgba(157,99,255,.22); pointer-events: none; z-index: 2; }
+.block { position: absolute; inset: 0; z-index: 3; display: none; place-items: center; text-align: center; padding: 22px; background: rgba(8,5,14,.86); }
+.phone[data-mode="isolate"] .block { display: grid; }
+.block strong { display: block; color: var(--pv-no); font-size: 1.05rem; margin-bottom: 8px; }
+.block span { font-size: .85rem; color: var(--sc-ink-soft); line-height: 1.5; }
+.readout { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.readout li { border: 1px solid var(--sc-hairline); border-radius: 14px; padding: 10px 16px; background: rgba(16,12,23,.6);
+  opacity: .28; transform: translateX(-10px); transition: opacity .4s, transform .4s, border-color .4s; }
+.readout li.on { opacity: 1; transform: none; border-color: rgba(157,99,255,.45); }
+.readout .q { font-size: .82rem; color: var(--sc-ink-soft); margin-bottom: 4px; }
+.readout .a { font-weight: 700; font-size: var(--sc-t-base); display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.readout .d { display: none; font-size: .82rem; color: var(--sc-ink-soft); margin-top: 6px; line-height: 1.5; }
+.readout li.cur .d { display: block; }
+.lab__verdict { grid-column: 1 / -1; font-size: var(--sc-t-base); line-height: 1.55; padding: 14px 18px; border-inline-start: 3px solid var(--sc-accent); background: rgba(16,12,23,.7); border-radius: 8px; max-width: 980px; }
+
+/* ---------- 6 protocol ---------- */
+.proto { padding: clamp(96px, 14vh, 160px) var(--gut); max-width: 1080px; margin: 0 auto; }
+.proto h2 { font-family: var(--sc-font-display); font-size: var(--sc-t-2xl); margin: 0 0 10px; }
+.proto > p { color: var(--sc-ink-soft); margin: 0 0 32px; max-width: 64ch; line-height: 1.6; }
+.test { display: grid; grid-template-columns: 1fr auto; gap: 10px 20px; padding: 18px 0; border-top: 1px solid var(--sc-hairline); align-items: center; }
+.test h3 { margin: 0; font-size: 1rem; font-weight: 700; }
+.test p { margin: 4px 0 0; color: var(--sc-ink-soft); font-size: .88rem; line-height: 1.5; }
+.test select { min-height: 44px; min-width: 150px; border-radius: 10px; background: var(--sc-surface); color: var(--sc-ink); border: 1px solid var(--sc-hairline-strong); font: inherit; padding: 0 10px; }
+.test select[data-v="yes"] { border-color: var(--pv-ok); } .test select[data-v="no"] { border-color: var(--pv-no); } .test select[data-v="na"] { border-color: var(--pv-warn); }
+.proto__sum { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--sc-hairline); }
+.proto__sum output { color: var(--sc-ink-soft); font-size: .9rem; }
+
+/* ---------- 7 close ---------- */
+.close { display: grid; place-items: center; padding: 72px var(--gut) 0; box-sizing: border-box; text-align: center;
+  background: radial-gradient(ellipse 50% 45% at 50% 42%, rgba(124,64,230,.28), transparent 70%); }
+.close__inner { display: grid; justify-items: center; gap: 22px; max-width: 760px; }
+.close h2 { font-family: var(--sc-font-display); font-weight: 900; font-size: var(--sc-t-3xl); line-height: 1; margin: 0; }
+.close p { margin: 0; color: var(--sc-ink-soft); line-height: 1.6; }
+.close .btn--big { min-height: 58px; padding: 0 34px; font-size: 1.1rem; }
+.apk { display: grid; gap: 6px; justify-items: center; font-size: .82rem; color: var(--sc-ink-soft); }
+.apk code { font-size: .68rem; word-break: break-all; max-width: 520px; }
+details.install { text-align: start; max-width: 620px; width: 100%; border: 1px solid var(--sc-hairline); border-radius: 14px; padding: 4px 18px; background: rgba(16,12,23,.6); }
+details.install summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 500; }
+details.install ol { margin: 0 0 14px; padding-inline-start: 20px; color: var(--sc-ink-soft); line-height: 1.7; font-size: .9rem; }
+.foot { position: absolute; inset: auto 0 0 0; padding: 16px var(--gut); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  font-family: var(--sc-font-mono); font-size: .7rem; color: var(--sc-ink-soft); letter-spacing: .08em; }
+.foot a { color: var(--sc-ink-soft); }
+
+/* ---------- mobile art direction ---------- */
+@media (max-width: 760px) {
+  .hero__door { top: 34%; width: 96vw; }
+  .hero__beat { top: auto; bottom: 34vh; inset-inline: var(--gut); font-size: 1rem; }
+  .hero__copy { bottom: 64px; }
+  .feat article { grid-column: 1 / -1 !important; }
+  .opts header, .opt { grid-template-columns: 1fr; gap: 10px; }
+  .arg__line:nth-child(2) { justify-self: start; text-align: right; }
+  .lab__inner { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr auto; gap: 12px; padding-top: 70px; align-items: start; }
+  .lab__head h2 { font-size: 1.5rem; } .lab__head p { display: none; }
+  .phone { display: none; }
+  .readout { gap: 6px; } .readout li { padding: 8px 12px; } .readout .a { font-size: .92rem; } .readout .q { font-size: .76rem; }
+  .modes { margin-top: 8px; }
+  .lab__verdict { font-size: .85rem; padding: 10px 14px; }
+  .test { grid-template-columns: 1fr; }
+  .close__inner { gap: 16px; }
+  .foot { position: static; justify-content: center; margin-top: 18px; }
+  .close { padding-bottom: 16px; }
+}
+@media (min-width: 761px) and (max-height: 820px) {
+  .lab__inner { padding-top: 64px; row-gap: 10px; }
+  .lab__head p { display: none; } .modes { margin-top: 6px; } .modes button { min-height: 32px; }
+  .readout { gap: 6px; } .readout li { padding: 6px 14px; } .readout .q { font-size: .74rem; margin-bottom: 2px; } .readout .a { font-size: .95rem; }
+  .readout .chip { padding: 2px 10px; font-size: .74rem; }
+  .lab__verdict { font-size: .88rem; padding: 10px 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .readout li { opacity: 1; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<span data-sc-progress></span>
+
+<header class="bar">
+  <a class="bar__mark" href="#top"><img src="logo.svg" alt="" width="26" height="26"><span class="ltr">PHANTOM VAULT</span></a>
+  <a class="btn" href="app/">פתח את הכספת</a>
+</header>
+
+<main id="top">
+
+  <!-- 1 · Hero: layered vault -->
+  <section class="hero" data-sc-act="pin" data-sc-span="2.2" data-sc-drift="#060508">
+    <div data-sc-stage>
+      <div class="hero__plane hero__grid" data-sc-parallax="-0.25" aria-hidden="true"></div>
+      <div class="hero__door" aria-hidden="true">
+        <svg viewBox="0 0 600 600">
+          <defs>
+            <radialGradient id="dg" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="#2a1a48"/><stop offset="1" stop-color="#0b0812"/></radialGradient>
+          </defs>
+          <circle cx="300" cy="300" r="290" fill="url(#dg)" stroke="#3b2468" stroke-width="2"/>
+          <g class="ring-a"><circle cx="300" cy="300" r="262" fill="none" stroke="#9d63ff" stroke-opacity=".55" stroke-width="2" stroke-dasharray="2 10"/>
+            <g fill="#1b1230" stroke="#5b3a99"><rect x="292" y="22" width="16" height="44" rx="4"/><rect x="292" y="534" width="16" height="44" rx="4"/><rect x="22" y="292" width="44" height="16" rx="4"/><rect x="534" y="292" width="44" height="16" rx="4"/></g></g>
+          <g class="ring-b"><circle cx="300" cy="300" r="210" fill="none" stroke="#c9a8ff" stroke-opacity=".35" stroke-width="18" stroke-dasharray="3 22"/></g>
+          <circle cx="300" cy="300" r="176" fill="#0d0916" stroke="#3b2468" stroke-width="2"/>
+          <g class="ring-c"><circle cx="300" cy="300" r="150" fill="none" stroke="#9d63ff" stroke-opacity=".7" stroke-width="1.5" stroke-dasharray="40 8 4 8"/>
+            <path d="M300 160 v280 M160 300 h280" stroke="#5b3a99" stroke-width="10" stroke-linecap="round"/></g>
+          <circle cx="300" cy="300" r="54" fill="#140d22" stroke="#9d63ff" stroke-width="2"/>
+          <path d="M282 296 v-14 a18 18 0 0 1 36 0 v14" fill="none" stroke="#e6d9ff" stroke-width="5"/>
+          <rect x="274" y="294" width="52" height="38" rx="6" fill="#e6d9ff"/>
+        </svg>
+      </div>
+      <div class="hero__copy" data-sc-cue="0 0.62 0">
+        <h1 class="ltr">PHANTOM VAULT</h1>
+        <p class="big" data-sc-kinetic="lines">כספת שנפתחת<br>רק בשבילך.</p>
+      </div>
+      <p class="hero__beat" data-sc-cue="0.42 1 0.2 0.06">היא שומרת קבצים, פתקים וקישורים בהצפנה.<br><b>ואומרת לך בדיוק מה היא לא יכולה להסתיר.</b></p>
+      <div class="hero__plane hero__gate" data-sc-parallax="0.18" aria-hidden="true"><i></i><i></i></div>
+      <div class="hero__plane hero__fog" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <!-- 2 · Contents -->
+  <section class="sc-section" data-sc-act="flow" data-sc-drift="#08060c">
+    <div class="contents">
+      <div data-sc-in data-sc-stagger="70">
+        <h2>מה יש בתוך הכספת.</h2>
+        <p>ארבעה דברים שעובדים היום, באתר ובאפליקציה. בלי הבטחות שלא נבדקו.</p>
+      </div>
+      <div class="feat" data-sc-in data-sc-stagger="90">
+        <article>
+          <span class="tag ltr">AES-256-GCM · PBKDF2</span>
+          <h3>קוד סודי, מפתח שלא יוצא מהמכשיר</h3>
+          <p>הקוד שלך (4 עד 12 ספרות) גוזר מפתח שעוטף את מפתח ההצפנה הראשי. קוד שגוי פשוט לא מצליח לפענח. אחרי כמה ניסיונות כושלים יש השהיה.</p>
+        </article>
+        <article>
+          <span class="tag">טביעת אצבע</span>
+          <h3>כניסה ביומטרית</h3>
+          <p>באפליקציית Android, דרך BiometricPrompt הרשמי של המערכת.</p>
+          <p class="honest">בגרסת האתר אין טביעת אצבע: רק קוד.</p>
+        </article>
+        <article>
+          <span class="tag">מסך בית פרטי</span>
+          <h3>רק האפליקציות שבחרת</h3>
+          <p>הוספה, עריכה ומחיקה של כפתורים שפותחים אפליקציות או אתרים. לחיצה ארוכה לעריכה.</p>
+          <p class="honest">באתר, הכפתור רק פותח את האפליקציה. היא נשארת מותקנת וגלויה למערכת. באפליקציית Android יש גם בידוד בפרופיל עבודה (ראו בהשוואה).</p>
+        </article>
+        <article>
+          <span class="tag">קבצים · תמונות · פתקים</span>
+          <h3>אחסון פרטי ונעילה אוטומטית</h3>
+          <p>תמונות, סרטונים וקבצים נשמרים מוצפנים בתוך הכספת, לצד פתקים. כשיוצאים, המפתח נמחק מהזיכרון והכספת ננעלת.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · Hide is not isolate -->
+  <section data-sc-act="pin" data-sc-span="2.4" data-sc-drift="#0b0714">
+    <div data-sc-stage class="arg">
+      <div class="arg__stack">
+        <p class="arg__line" data-sc-cue="0 0.36 0" data-sc-kinetic="lines">להסתיר סמל זה <em>להזיז שלט.</em></p>
+        <p class="arg__line" data-sc-cue="0.3 0.66" data-sc-kinetic="lines">האפליקציה עדיין מותקנת, <em>עדיין רשומה,</em> עדיין נספרת.</p>
+        <p class="arg__last" data-sc-cue="0.62 1 0.2 0.12">בידוד אמיתי אומר פרופיל נפרד: מרחב אחר, נתונים אחרים, מפתח אחר.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · Options compared -->
+  <section class="sc-section" data-sc-act="flow" data-sc-drift="#08060c">
+    <div class="opts">
+      <header data-sc-in data-sc-stagger="70">
+        <h2>כל האפשרויות הרשמיות, זו מול זו.</h2>
+        <p>"מתועד" אומר שהיצרן כתב את זה. "לא נבדק" אומר שלא הרצנו את זה על מכשיר. שום שורה כאן לא מסומנת כהצלחה בלי מקור.</p>
+      </header>
+
+      <div class="opt" data-sc-reveal="left" data-sc-reveal-at="0.05 0.3">
+        <h3>Android Private Space<small class="ltr">ANDROID 15+</small></h3>
+        <p>פרופיל נפרד וננעל. כשהוא נעול, האפליקציות שבו לא מופיעות במגירה, בהתראות, במסך האחרונים ובהגדרות. זה הבידוד הרשמי החזק ביותר באנדרואיד נקי.</p>
+        <div class="verdict"><span class="chip chip--ok">הבחירה הטובה ביותר במכשיר לא מפוקח</span><span class="chip chip--no">בחשבון בפיקוח: לפי דיווחים, לא זמין</span><span class="src">מקור צד שלישי, לא אושר במסמך רשמי של Google</span></div>
+      </div>
+      <div class="opt" data-sc-reveal="left" data-sc-reveal-at="0.1 0.35">
+        <h3>Samsung Secure Folder<small class="ltr">KNOX · ONE UI</small></h3>
+        <p>מיכל מוגן של Samsung עם אפליקציות ונתונים משלו, ננעל בקוד או בטביעת אצבע. אפשר גם להסתיר את סמל התיקייה עצמה.</p>
+        <div class="verdict"><span class="chip chip--ok">הבחירה הטובה ביותר ב-Samsung לא מפוקח</span><span class="chip chip--no">חשבון ילד ב-Family Link: היצירה חסומה</span><span class="src">תמיכת Samsung: חסום כי הוא מאפשר לעקוף הגבלות הורים</span></div>
+      </div>
+      <div class="opt" data-sc-reveal="left" data-sc-reveal-at="0.15 0.4">
+        <h3>משתמש נפרד<small class="ltr">MULTI-USER</small></h3>
+        <p>הפרדה מלאה: חשבון, אפליקציות ונתונים משלו. מחליפים משתמש מהגדרות המערכת. בטלפוני Samsung רבים התכונה לא קיימת.</p>
+        <div class="verdict"><span class="chip chip--warn">תלוי ביצרן ובדגם</span><span class="chip chip--un">בחשבון בפיקוח: לא נבדק</span></div>
+      </div>
+      <div class="opt" data-sc-reveal="left" data-sc-reveal-at="0.18 0.43">
+        <h3>פרופיל עבודה<small class="ltr">MANAGED PROFILE · DEVICEPOLICYMANAGER</small></h3>
+        <p>פרופיל נפרד שאפליקציה רשמית יוצרת ומנהלת, עם אפליקציות ונתונים משלו. אפליקציית PHANTOM VAULT ל-Android משתמשת ב-API הזה.</p>
+        <div class="verdict"><span class="chip chip--ok">קיים באפליקציה, למכשיר לא מפוקח</span><span class="chip chip--un">בחשבון בפיקוח: לא נבדק, ולא מוצג כדרך לעקוף פיקוח</span></div>
+      </div>
+      <div class="opt" data-sc-reveal="left" data-sc-reveal-at="0.22 0.47">
+        <h3>הסתרת סמל ממסך הבית<small class="ltr">LAUNCHER</small></h3>
+        <p>ב-One UI: הגדרות מסך הבית, הסתרת אפליקציות. משנה רק את המשגר. האפליקציה מותקנת, מופיעה בהגדרות, ונספרת בנתוני השימוש.</p>
+        <div class="verdict"><span class="chip chip--ok">עובד, אבל רק קוסמטי</span><span class="chip chip--no">לא משנה דבר ב-Family Link</span></div>
+      </div>
+      <div class="opt" data-sc-reveal="left" data-sc-reveal-at="0.26 0.51">
+        <h3>חסימת תצוגות מקדימות<small class="ltr">FLAG_SECURE · LOCK SCREEN</small></h3>
+        <p>אפליקציה יכולה לבקש מהמערכת להציג מסך ריק במסך האחרונים ולחסום צילומי מסך. בנוסף, בהגדרות ההתראות אפשר להסתיר תוכן התראות במסך הנעילה.</p>
+        <div class="verdict"><span class="chip chip--ok">עובד במכשיר כלשהו</span><span class="chip chip--un">מגן מעיניים שליד המסך, לא מ-Family Link</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · PEAK: Family Link lab -->
+  <section id="lab" data-sc-act="pin" data-sc-span="3.6" data-sc-drift="#0d0719">
+    <div data-sc-stage class="lab">
+      <div class="lab__inner">
+        <div class="lab__head" data-sc-cue="0 1 0 0">
+          <h2>מעבדת Family Link</h2>
+          <p>הקורה סורקת את שכבות הטלפון. כל שורה מימין נדלקת כשהיא מגיעה למה שההורה רואה.</p>
+          <div class="modes" role="group" aria-label="מצב האפליקציה הפרטית">
+            <button type="button" data-mode="plain" aria-pressed="true">רגיל</button>
+            <button type="button" data-mode="hide" aria-pressed="false">סמל מוסתר</button>
+            <button type="button" data-mode="isolate" aria-pressed="false">בידוד</button>
+          </div>
+        </div>
+
+        <div class="phone" data-mode="plain" aria-hidden="true">
+          <div class="phone__screen">
+            <div class="beam"></div>
+            <div class="layer layer--ui"><span class="layer__name">מסך הבית</span><span class="layer__apps"><i class="app"></i><i class="app"></i><i class="app app--p"></i><i class="app"></i><i class="app"></i></span></div>
+            <div class="layer layer--ui"><span class="layer__name">מגירת האפליקציות</span><span class="layer__apps"><i class="app"></i><i class="app"></i><i class="app"></i><i class="app app--p"></i><i class="app"></i><i class="app"></i></span></div>
+            <div class="layer"><span class="layer__name ltr">PackageManager · רשימת מותקנות</span><span class="layer__apps"><i class="app"></i><i class="app app--p"></i><i class="app"></i><i class="app"></i><i class="app"></i><i class="app"></i><i class="app"></i></span></div>
+            <div class="layer"><span class="layer__name ltr">UsageStats · זמן שימוש</span><span class="layer__apps"><i class="app"></i><i class="app"></i><i class="app app--p"></i><i class="app"></i></span></div>
+            <div class="layer"><span class="layer__name">יומן התקנות</span><span class="layer__apps"><i class="app app--p"></i><i class="app"></i></span></div>
+            <div class="block"><div><strong>הבידוד חסום בחשבון בפיקוח</strong><span>Secure Folder ו-Private Space לא נפתחים בחשבון ילד. האפליקציה נשארת בפרופיל הראשי, שם ההורה רואה אותה.</span></div></div>
+          </div>
+        </div>
+
+        <ol class="readout">
+          <li data-at="0.12"><div class="q">האם האפליקציה מופיעה ברשימת האפליקציות?</div><div class="a">כן <span class="chip chip--warn">מתועד · לא נבדק במכשיר</span></div><div class="d">Family Link מציג להורה את האפליקציות המותקנות במכשיר הילד, וגם מאפשר לחסום אותן.</div></li>
+          <li data-at="0.3"><div class="q">האם אפשר לראות את זמן השימוש בה?</div><div class="a">כן <span class="chip chip--warn">מתועד · לא נבדק במכשיר</span></div><div class="d">דוחות פעילות יומיים ושבועיים לכל אפליקציה, ומגבלות זמן לכל אפליקציה.</div></li>
+          <li data-at="0.48"><div class="q">האם ההתקנה שלה מזוהה?</div><div class="a">כן <span class="chip chip--warn">מתועד · לא נבדק במכשיר</span></div><div class="d">אפליקציה חדשה מופיעה ברשימה של ההורה. הורדות מ-Google Play יכולות לדרוש אישור הורה, לפי ההגדרה.</div></li>
+          <li data-at="0.66"><div class="q">איזה מידע Android חושף ל-Family Link?</div><div class="a">רשימת מותקנות, זמני שימוש, מיקום (אם הופעל), פרטי מכשיר</div><div class="d">Family Link מנהל את החשבון והמכשיר דרך ממשקי ניהול רשמיים. הכספת לא יכולה, ולא מנסה, לשנות את מה שהם מדווחים.</div></li>
+          <li data-at="0.82"><div class="q">הסתרת סמל מול בידוד?</div><div class="a" id="modeAnswer">הסמל גלוי, וכך גם כל השאר.</div><div class="d" id="modeDetail">בחר מצב למעלה כדי לראות מה משתנה.</div></li>
+        </ol>
+
+        <p class="lab__verdict" data-sc-cue="0.88 1 0.1 0"><b>השורה התחתונה:</b> אין דרך חוקית ונתמכת להסתיר אפליקציות מהורה שמפקח דרך Family Link. הכלים שמבודדים באמת חסומים שם בכוונה, ולא בנינו שום מנגנון שנועד לעקוף את זה. הדרך הרשמית היא החלטה של ההורה, או מעבר לניהול עצמי כשמגיעים לגיל שבו Google מאפשרת זאת במדינה שלך.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · Protocol -->
+  <section class="sc-section" data-sc-act="flow" data-sc-drift="#08060c">
+    <div class="proto">
+      <div data-sc-in data-sc-stagger="70">
+        <h2>פרוטוקול בדיקה במכשיר שלך.</h2>
+        <p>מה שמעל מבוסס על תיעוד, לא על בדיקה. כאן אתה רושם מה ראית בפועל. כל שורה מתחילה ב"לא נבדק", והתוצאות נשמרות רק בדפדפן הזה.</p>
+      </div>
+      <form id="proto" data-sc-in>
+        <div class="test"><div><h3>האפליקציה ברשימה של ההורה</h3><p>באפליקציית Family Link של ההורה: בחירת הילד, אפליקציות. האם היא מופיעה?</p></div><select name="t1" aria-label="תוצאה"></select></div>
+        <div class="test"><div><h3>זמן שימוש</h3><p>Family Link, פעילות. האם מופיע זמן שימוש לאפליקציה הזו?</p></div><select name="t2" aria-label="תוצאה"></select></div>
+        <div class="test"><div><h3>זיהוי התקנה</h3><p>אחרי התקנה חדשה: האם ההורה קיבל התראה או בקשת אישור?</p></div><select name="t3" aria-label="תוצאה"></select></div>
+        <div class="test"><div><h3>אחרי הסתרת סמל</h3><p>One UI: הגדרות מסך הבית, הסתרת אפליקציות. האם היא עדיין מופיעה אצל ההורה?</p></div><select name="t4" aria-label="תוצאה"></select></div>
+        <div class="test"><div><h3>Secure Folder זמין</h3><p>הגדרות, אבטחה ופרטיות, Secure Folder. האם אפשר ליצור אותה בחשבון הזה?</p></div><select name="t5" aria-label="תוצאה"></select></div>
+        <div class="test"><div><h3>Private Space זמין</h3><p>הגדרות, אבטחה ופרטיות, מרחב פרטי (Android 15 ומעלה). האם אפשר להגדיר אותו?</p></div><select name="t6" aria-label="תוצאה"></select></div>
+        <div class="test"><div><h3>תצוגה מקדימה במסך האחרונים</h3><p>פתח את הכספת, לחץ על כפתור האחרונים. האם התוכן מוסתר?</p></div><select name="t7" aria-label="תוצאה"></select></div>
+        <div class="test"><div><h3>תוכן התראות במסך הנעילה</h3><p>הגדרות, התראות, התראות במסך נעילה: הסתר תוכן. האם התוכן מוסתר?</p></div><select name="t8" aria-label="תוצאה"></select></div>
+        <div class="proto__sum">
+          <button type="button" class="btn btn--ghost" id="copyRes">העתק תוצאות</button>
+          <button type="button" class="btn btn--ghost" id="resetRes">אפס</button>
+          <output id="sum" aria-live="polite"></output>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- 7 · Close -->
+  <section id="open" data-sc-act="pin" data-sc-span="1.3" data-sc-drift="#060508">
+    <div data-sc-stage class="close" data-sc-spotlight>
+      <div class="close__inner">
+        <h2 data-sc-cue="0 1 0 0">הכספת מוכנה.</h2>
+        <p data-sc-cue="0 1 0 0">פותחים בדפדפן בלי התקנה, או מתקינים את אפליקציית Android.</p>
+        <a class="btn btn--big" href="app/" data-sc-magnet="0.26" data-sc-cue="0 1 0 0" data-sc-rise="0">פתח את הכספת</a>
+        <div class="apk" data-sc-cue="0 1 0 0">
+          <a class="btn btn--ghost" href="PhantomVault.apk" download>הורדת APK · גרסה <span id="ver">1.3.0</span></a>
+          <span>Android 9 ומעלה · SHA-256</span>
+          <code class="ltr mono" id="sha">c641edb3733753d9112ad1feadf32206534590b584aa4322f3b0be04bac28937</code>
+        </div>
+        <details class="install" data-sc-cue="0 1 0 0">
+          <summary>הוראות התקנה</summary>
+          <ol>
+            <li>הורד את קובץ ה-APK ופתח אותו מההתראה או מ"הקבצים שלי".</li>
+            <li>אם מופיע "התקנה ממקורות לא ידועים": הגדרות, אפשר לאפליקציה הזו, חזור.</li>
+            <li>Samsung: אם Auto Blocker חוסם, הגדרות, אבטחה ופרטיות, Auto Blocker, כבה זמנית ואחר כך הדלק שוב.</li>
+            <li>התקן, פתח את PHANTOM VAULT ובחר קוד סודי.</li>
+            <li>עדכון: מורידים שוב ומתקינים מעל. הנתונים נשמרים.</li>
+          </ol>
+        </details>
+      </div>
+      <footer class="foot"><span class="ltr">PHANTOM VAULT</span><a href="download.html">עמוד ההורדה הקודם</a></footer>
+    </div>
+  </section>
+
 </main>
+
+<script src="scrollcraft.js"></script>
+<script>ScrollCraft.mount(document.body);</script>
 <script>
-fetch('version.json',{cache:'no-store'}).then(r=>r.json()).then(j=>{document.getElementById('ver').textContent=j.version;document.getElementById('sha').textContent=j.sha256}).catch(()=>{});
+(function () {
+  // --- version from version.json (the APK's real hash) ---
+  fetch('version.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (v) {
+    if (v.version) document.getElementById('ver').textContent = v.version;
+    if (v.sha256) document.getElementById('sha').textContent = v.sha256;
+  }).catch(function () {});
+
+  // --- signature: the lab scanner ---
+  var lab = document.getElementById('lab');
+  var phone = lab.querySelector('.phone');
+  var layers = lab.querySelectorAll('.layer');
+  var rows = lab.querySelectorAll('.readout li');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var last = -1;
+  function tick() {
+    var r = lab.getBoundingClientRect();
+    var travel = Math.max(r.height - innerHeight, 1);
+    var p = Math.min(1, Math.max(0, -r.top / travel));
+    if (reduce) p = 1;
+    if (Math.abs(p - last) > 0.002) {
+      last = p;
+      var beam = Math.min(1, p / 0.86);
+      phone.style.setProperty('--beam', beam.toFixed(4));
+      var idx = Math.min(layers.length - 1, Math.floor(beam * layers.length));
+      layers.forEach(function (l, i) { l.classList.toggle('hit', i === idx && beam < 1); });
+      var cur = null; rows.forEach(function (li) { var on = p >= parseFloat(li.dataset.at); li.classList.toggle('on', on); if (on) cur = li; });
+      rows.forEach(function (li) { li.classList.toggle('cur', li === cur); });
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  var copy = {
+    plain: ['הסמל גלוי, וכך גם כל השאר.', 'המצב הרגיל: האפליקציה מופיעה בכל חמש השכבות.'],
+    hide: ['הסמל נעלם. ההורה עדיין רואה הכול.', 'הסתרת סמל מוחקת אותה רק משתי השכבות העליונות. הקורה עדיין מוצאת אותה ברשימת המותקנות, בזמני השימוש וביומן ההתקנות.'],
+    isolate: ['בידוד היה מעביר אותה לפרופיל אחר. בחשבון בפיקוח הוא חסום.', 'Samsung חוסמת יצירת Secure Folder בחשבון ילד, ו-Private Space לפי דיווחים לא זמין בחשבון בפיקוח. האפליקציה נשארת בפרופיל הראשי.']
+  };
+  lab.querySelectorAll('.modes button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var m = b.dataset.mode;
+      phone.dataset.mode = m;
+      lab.querySelectorAll('.modes button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      document.getElementById('modeAnswer').textContent = copy[m][0];
+      document.getElementById('modeDetail').textContent = copy[m][1];
+    });
+  });
+
+  // --- protocol: visitor-recorded results, default "not tested" ---
+  var KEY = 'pv_protocol_v1';
+  var opts = [['', 'לא נבדק'], ['yes', 'כן'], ['no', 'לא'], ['na', 'לא זמין במכשיר']];
+  var form = document.getElementById('proto');
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { saved = {}; }
+  var sels = form.querySelectorAll('select');
+  sels.forEach(function (s) {
+    opts.forEach(function (o) { var op = document.createElement('option'); op.value = o[0]; op.textContent = o[1]; s.appendChild(op); });
+    s.value = saved[s.name] || '';
+    s.dataset.v = s.value;
+    s.addEventListener('change', function () {
+      s.dataset.v = s.value; saved[s.name] = s.value;
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+      sum();
+    });
+  });
+  function sum() {
+    var n = 0; sels.forEach(function (s) { if (s.value) n++; });
+    document.getElementById('sum').textContent = n + ' מתוך ' + sels.length + ' נבדקו בפועל. השאר מסומנים "לא נבדק".';
+  }
+  sum();
+  document.getElementById('resetRes').addEventListener('click', function () {
+    saved = {}; try { localStorage.removeItem(KEY); } catch (e) {}
+    sels.forEach(function (s) { s.value = ''; s.dataset.v = ''; }); sum();
+  });
+  document.getElementById('copyRes').addEventListener('click', function () {
+    var lines = ['PHANTOM VAULT · פרוטוקול בדיקה'];
+    sels.forEach(function (s) {
+      var h = s.closest('.test').querySelector('h3').textContent;
+      lines.push(h + ': ' + s.options[s.selectedIndex].textContent);
+    });
+    var t = lines.join('\n');
+    var out = document.getElementById('sum');
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { out.textContent = 'התוצאות הועתקו.'; },
+      function () { out.textContent = 'לא ניתן להעתיק בדפדפן הזה.'; });
+  });
+})();
 </script>
-</body></html>
+</body>
+</html>
