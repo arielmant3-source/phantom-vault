@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#10131D">
+<title>מודה אני</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Heebo:wght@400;500;700&display=swap">
+<style>
+/* One column: clock, tonight's alarm, the after-sleep option, and a setup checklist.
+   Full-screen layers cover it for the night screen and the prayer screen. */
+:root {
+  --bg: #10131d; --surface: #191d2a; --fg: #ece8df; --muted: #9aa0b3; --line: #2b3042;
+  --accent: #e39a5f; --on-accent: #1b1206; --ok: #5cc486; --ring: #f0645a;
+  --display: "Frank Ruhl Libre", "David", "Times New Roman", serif;
+  --body: "Heebo", "Arial Hebrew", Arial, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box }
+html, body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 var(--body) }
+body { padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)) }
+main { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px }
+h1 { margin: 0; font: 700 32px var(--display); color: var(--accent) }
+h2 { margin: 0; font: 700 22px var(--display) }
+.sub { color: var(--muted); font-size: 14px; margin: 0 }
+.now { font: 700 clamp(64px, 22vw, 96px)/1 var(--display); font-variant-numeric: tabular-nums; text-align: center }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap }
+input[type="time"] { font: 700 30px var(--body); font-variant-numeric: tabular-nums; padding: 6px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--fg); direction: ltr }
+button { font: 500 17px var(--body); border-radius: 12px; padding: 12px 18px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-weight: 700 }
+button.big { width: 100%; padding: 16px; font-size: 19px }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px }
+label.switch { display: flex; gap: 10px; align-items: center; font-weight: 500 }
+label.switch input { width: 22px; height: 22px; accent-color: var(--accent) }
+.hint { font-size: 14px; color: var(--muted); margin: 0 }
+.checks { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none }
+.checks li { display: flex; gap: 10px; align-items: baseline; font-size: 15px }
+.mark { font-weight: 700; min-width: 1.2em }
+.mark.ok { color: var(--ok) } .mark.bad { color: var(--ring) } .mark.info { color: var(--muted) }
+[hidden] { display: none !important }
+
+/* Night screen */
+.layer { position: fixed; inset: 0; z-index: 10; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center }
+.night .clock { font: 700 clamp(72px, 24vw, 120px)/1 var(--display); color: #4a3a2c; font-variant-numeric: tabular-nums }
+.night p { color: #3b3f4d; margin: 0; font-size: 15px }
+
+/* Prayer screen */
+.pray { background: var(--bg); overflow-y: auto; justify-content: flex-start; padding-top: max(36px, env(safe-area-inset-top)) }
+.pray .inner { max-width: 560px; width: 100%; display: flex; flex-direction: column; gap: 16px }
+.bell { font: 700 64px/1 var(--display); font-variant-numeric: tabular-nums; color: var(--ring); animation: pulse 1s ease-in-out infinite }
+.bell.calm { color: var(--accent); animation: none }
+@keyframes pulse { 50% { opacity: .45 } }
+@media (prefers-reduced-motion: reduce) { .bell { animation: none } }
+.prayer { font: 700 clamp(26px, 7.5vw, 36px)/1.6 var(--display); background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 12px }
+.w { color: var(--muted); transition: color .2s } .w.hit { color: var(--ok) }
+.heard { min-height: 3em; color: var(--muted); font-size: 15px }
+.mic.on { background: var(--ring); border-color: var(--ring); color: #fff }
+textarea { width: 100%; font: 20px var(--display); padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--fg) }
+.done { color: var(--ok); font: 700 32px var(--display) }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>מודה אני</h1>
+    <p class="sub">שעון מעורר שנעצר רק כשאומרים מודה אני</p>
+  </header>
+  <div class="now" id="now">--:--</div>
+
+  <section class="card" aria-labelledby="h-alarm">
+    <h2 id="h-alarm">שעון מעורר</h2>
+    <div class="row">
+      <label for="alarm-time">להעיר אותי ב־</label>
+      <input type="time" id="alarm-time" value="06:30">
+    </div>
+    <button class="primary big" id="go">לילה טוב, הפעל את השעון</button>
+    <p class="hint">לוחצים על זה כל ערב לפני השינה. המסך יישאר דולק ושחור עם שעון עמום. משאירים את הטלפון על המטען ואת האפליקציה פתוחה. אם סוגרים את האפליקציה, השעון לא יצלצל.</p>
+    <button id="test">נסה צלצול עכשיו</button>
+  </section>
+
+  <section class="card" aria-labelledby="h-sleep">
+    <h2 id="h-sleep">מודה אני אחרי שינה</h2>
+    <label class="switch"><input type="checkbox" id="sleep-on"> הצג מסך מודה אני כשחוזרים אחרי שינה</label>
+    <div class="row">
+      <span>אחרי</span>
+      <button id="h-minus" aria-label="פחות שעות">−</button>
+      <strong id="hours">5</strong>
+      <button id="h-plus" aria-label="יותר שעות">+</button>
+      <span>שעות בלי שימוש</span>
+    </div>
+    <p class="hint">אם האפליקציה הייתה פתוחה והמסך כבה לכמה שעות, כשמדליקים את המסך בבוקר יופיע מסך מודה אני. אפשר לדלג עליו. זה לא עובד כשהשעון המעורר פעיל, כי אז המסך דולק כל הלילה, והשעון עצמו פותח את מסך מודה אני.</p>
+  </section>
+
+  <section class="card" aria-labelledby="h-setup">
+    <h2 id="h-setup">לפני הלילה הראשון</h2>
+    <ul class="checks">
+      <li><span class="mark" id="c-install"></span><span id="t-install"></span></li>
+      <li><span class="mark" id="c-speech"></span><span id="t-speech"></span></li>
+      <li><span class="mark info">•</span><span>הצלצול מושמע בעוצמת המדיה. בדוק שעוצמת המדיה בטלפון גבוהה ושהטלפון לא על מצב שקט מוחלט.</span></li>
+    </ul>
+    <button id="mic-test">בדוק מיקרופון</button>
+    <p class="hint" id="mic-result"></p>
+  </section>
+</main>
+
+<div class="layer night" id="night" hidden>
+  <div class="clock" id="night-clock">--:--</div>
+  <p id="night-info"></p>
+  <p>הקש פעמיים כדי לחזור להגדרות</p>
+</div>
+
+<div class="layer pray" id="pray" hidden>
+  <div class="inner">
+    <div class="bell" id="bell">--:--</div>
+    <p id="lead" style="margin:0;font-size:17px">כדי לעצור, לחץ על המיקרופון ואמור:</p>
+    <div class="prayer" id="prayer"></div>
+    <button class="primary big mic" id="mic">🎙 לחץ ואמור מודה אני</button>
+    <div id="type-box" hidden>
+      <p class="hint">זיהוי דיבור לא זמין כאן. הקלד את כל המשפט:</p>
+      <textarea id="typed" rows="3" aria-label="הקלד את מודה אני"></textarea>
+    </div>
+    <div class="heard" id="heard" aria-live="polite"></div>
+    <div class="done" id="done" hidden>בוקר טוב ☀</div>
+    <button id="skip" hidden>לא עכשיו</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const pad = (n) => String(n).padStart(2, "0");
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("modeh-" + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem("modeh-" + k, JSON.stringify(v)); } catch (e) {} },
+  };
+
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+
+  // ---------- Prayer matching ----------
+  const PRAYER = "מודה אני לפניך מלך חי וקיים שהחזרת בי נשמתי בחמלה רבה אמונתך";
+  const WORDS = PRAYER.split(" ");
+  const finals = { "ך": "כ", "ם": "מ", "ן": "נ", "ף": "פ", "ץ": "צ" };
+  function norm(s) {
+    return s.replace(/[֑-ׇ]/g, "").replace(/[ךםןףץ]/g, (c) => finals[c])
+      .replace(/[^א-ת\s]/g, " ").replace(/(?<=\S)[וי](?=\S)/g, "")
+      .trim().split(/\s+/).filter(Boolean);
+  }
+  function lev(a, b) {
+    const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+    for (let j = 1; j <= b.length; j++) d[0][j] = j;
+    for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+      d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+    return d[a.length][b.length];
+  }
+  const TARGET = WORDS.map((w) => norm(w)[0]);
+  let hits = WORDS.map(() => false);
+  function mark(text) {
+    const heard = norm(text), pool = heard.slice();
+    for (let i = 0; i + 1 < heard.length; i++) pool.push(heard[i] + heard[i+1]);
+    TARGET.forEach((t, i) => {
+      if (hits[i]) return;
+      hits[i] = pool.some((h) => { const d = h === t ? 0 : lev(h, t); return d === 0 || (t.length >= 3 && d <= 1) || (t.length >= 6 && d <= 2); });
+    });
+  }
+  const complete = () => hits[0] && hits[1] && hits.filter(Boolean).length >= WORDS.length - 1;
+  WORDS.forEach((w, i) => { const s = document.createElement("span"); s.className = "w"; s.id = "w" + i; s.textContent = w; $("prayer").appendChild(s); });
+  const paint = (all) => WORDS.forEach((_, i) => $("w" + i).classList.toggle("hit", all || hits[i]));
+
+  // ---------- Settings ----------
+  $("alarm-time").value = store.get("time", "06:30");
+  $("alarm-time").addEventListener("change", () => { store.set("time", $("alarm-time").value); updateNightInfo(); });
+  let hours = store.get("hours", 5);
+  $("sleep-on").checked = store.get("sleepOn", false);
+  $("hours").textContent = hours;
+  $("sleep-on").addEventListener("change", () => store.set("sleepOn", $("sleep-on").checked));
+  const setHours = (d) => { hours = Math.max(2, Math.min(12, hours + d)); $("hours").textContent = hours; store.set("hours", hours); };
+  $("h-minus").addEventListener("click", () => setHours(-1));
+  $("h-plus").addEventListener("click", () => setHours(1));
+
+  // ---------- Sound ----------
+  let ctx = null, master = null, beepTimer = null, ringStart = 0, ducked = false;
+  function unlockAudio() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!ctx && AC) { ctx = new AC(); master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination); }
+    if (ctx && ctx.state !== "running") ctx.resume().catch(() => {});
+  }
+  function beep(at, f) {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = "square"; o.frequency.value = f;
+    g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(0.5, at + 0.01);
+    g.gain.setValueAtTime(0.5, at + 0.13); g.gain.linearRampToValueAtTime(0, at + 0.15);
+    o.connect(g); g.connect(master); o.start(at); o.stop(at + 0.17);
+  }
+  function volume() {
+    if (!master) return;
+    const full = Math.min(1, 0.35 + (Date.now() - ringStart) / 60000 * 0.65);
+    master.gain.setTargetAtTime(ducked ? 0.04 : full, ctx.currentTime, 0.1);
+  }
+  function startSound() {
+    unlockAudio(); ringStart = Date.now();
+    const burst = () => {
+      if (!ctx) return;
+      if (ctx.state !== "running") ctx.resume().catch(() => {});
+      const t = ctx.currentTime + 0.05;
+      [0, 0.2, 0.4, 0.6].forEach((dt) => beep(t + dt, 880));
+      volume();
+      if (!ducked && navigator.vibrate) navigator.vibrate([600, 300, 600]);
+    };
+    burst(); beepTimer = setInterval(burst, 1500);
+  }
+  function stopSound() {
+    clearInterval(beepTimer); beepTimer = null;
+    if (master) master.gain.setTargetAtTime(0, ctx.currentTime, 0.05);
+    if (navigator.vibrate) navigator.vibrate(0);
+  }
+  function duck(on) { ducked = on; volume(); if (on && navigator.vibrate) navigator.vibrate(0); }
+
+  // ---------- Screen wake lock ----------
+  let lock = null, wantLock = false;
+  async function keepAwake() {
+    wantLock = true;
+    try { if ("wakeLock" in navigator && !lock) { lock = await navigator.wakeLock.request("screen"); lock.addEventListener("release", () => { lock = null; }); } } catch (e) {}
+  }
+  function releaseLock() { wantLock = false; if (lock) { lock.release().catch(() => {}); lock = null; } }
+
+  // ---------- Night mode ----------
+  let armed = false;
+  function updateNightInfo() { $("night-info").textContent = "השעון יצלצל ב־" + $("alarm-time").value; }
+  $("go").addEventListener("click", () => {
+    unlockAudio(); keepAwake();
+    store.set("time", $("alarm-time").value);
+    armed = true; store.set("armedDay", "");
+    updateNightInfo();
+    $("night").hidden = false;
+    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+  });
+  let lastTap = 0;
+  $("night").addEventListener("click", () => {
+    const now = Date.now();
+    if (now - lastTap < 400) { $("night").hidden = true; armed = false; releaseLock(); if (document.fullscreenElement) document.exitFullscreen().catch(() => {}); }
+    lastTap = now;
+  });
+
+  // ---------- Clock tick ----------
+  let firedFor = "";
+  function tick() {
+    const d = new Date(), hm = pad(d.getHours()) + ":" + pad(d.getMinutes());
+    $("now").textContent = hm; $("night-clock").textContent = hm;
+    if (!armed || !$("pray").hidden) return;
+    const [ah, am] = $("alarm-time").value.split(":").map(Number);
+    const due = new Date(d); due.setHours(ah, am, 0, 0);
+    const late = d - due;
+    const key = d.toDateString() + " " + $("alarm-time").value;
+    // Ring at the minute, or up to an hour late if the phone paused the page.
+    if (late >= 0 && late < 60 * 60 * 1000 && firedFor !== key) { firedFor = key; ring("alarm"); }
+  }
+  setInterval(tick, 1000); tick();
+
+  // ---------- After-sleep screen ----------
+  function seen() { store.set("lastSeen", Date.now()); }
+  setInterval(() => { if (document.visibilityState === "visible") seen(); }, 30000);
+  function checkSleep() {
+    const last = store.get("lastSeen", 0);
+    if ($("sleep-on").checked && last && Date.now() - last >= hours * 3600000 && $("pray").hidden
+        && Date.now() - store.get("lastSaid", 0) > 3 * 3600000) ring("wake");
+    seen();
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") seen();
+    else { checkSleep(); if (wantLock) keepAwake(); tick(); }
+  });
+  checkSleep();
+
+  // ---------- Prayer screen ----------
+  let mode = "alarm", done = false;
+  function ring(m) {
+    mode = m; done = false; hits = WORDS.map(() => false); paint(false); finalText = "";
+    $("bell").textContent = $("now").textContent;
+    $("bell").classList.toggle("calm", m === "wake");
+    $("lead").textContent = m === "alarm" ? "כדי לעצור, לחץ על המיקרופון ואמור:" : "בוקר טוב. לפני הכול, אמור:";
+    $("skip").hidden = m !== "wake";
+    $("done").hidden = true; $("heard").textContent = ""; $("typed").value = "";
+    $("mic").hidden = !Rec; $("type-box").hidden = !!Rec;
+    $("night").hidden = true; $("pray").hidden = false;
+    if (m === "alarm") {
+      startSound(); keepAwake();
+      history.pushState({ ring: 1 }, "");
+    }
+  }
+  // While ringing, Back does not leave the page.
+  window.addEventListener("popstate", () => { if (!$("pray").hidden && mode === "alarm" && !done) history.pushState({ ring: 1 }, ""); });
+  window.addEventListener("beforeunload", (e) => { if (!$("pray").hidden && mode === "alarm" && !done) { e.preventDefault(); e.returnValue = ""; } });
+
+  function check(text) {
+    if (done) return;
+    mark(text); paint(false);
+    if (complete()) finish(true);
+  }
+  function finish(said) {
+    done = true;
+    stopListening(); stopSound(); duck(false);
+    if (said) {
+      store.set("lastSaid", Date.now());
+      paint(true); $("done").hidden = false; $("mic").hidden = true; $("type-box").hidden = true; $("skip").hidden = true;
+      setTimeout(close, 3000);
+    } else close();
+  }
+  function close() {
+    $("pray").hidden = true; armed = false; releaseLock();
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  }
+  $("skip").addEventListener("click", () => finish(false));
+  $("typed").addEventListener("input", () => check($("typed").value));
+  $("test").addEventListener("click", () => { unlockAudio(); ring("alarm"); });
+
+  // ---------- Speech ----------
+  const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null, listening = false, finalText = "", wantListen = false, listenUntil = 0;
+  function setMic(on) {
+    listening = on;
+    $("mic").classList.toggle("on", on);
+    $("mic").textContent = on ? "⏺ מקשיב… אמור מודה אני" : "🎙 לחץ ואמור מודה אני";
+    if (mode === "alarm") duck(on);
+  }
+  function startListening() {
+    if (!Rec || done) return;
+    wantListen = true; listenUntil = Date.now() + 25000;
+    if (listening) return;
+    rec = new Rec();
+    rec.lang = "he-IL"; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 5;
+    rec.onstart = () => setMic(true);
+    rec.onresult = (e) => {
+      let interim = "";
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const r = e.results[i];
+        for (let k = 0; k < r.length; k++) check(r[k].transcript);
+        if (r.isFinal) finalText += " " + r[0].transcript; else interim += " " + r[0].transcript;
+      }
+      $("heard").textContent = (finalText + interim).trim();
+      listenUntil = Date.now() + 15000;
+    };
+    rec.onerror = (e) => {
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+        wantListen = false;
+        $("heard").textContent = "אין גישה למיקרופון. אפשר להקליד במקום.";
+        $("mic").hidden = true; $("type-box").hidden = false;
+      } else if (e.error === "language-not-supported") {
+        wantListen = false; $("mic").hidden = true; $("type-box").hidden = false;
+      } else if (e.error === "network") {
+        $("heard").textContent = "זיהוי הדיבור צריך אינטרנט. בדוק את החיבור או הקלד.";
+        $("type-box").hidden = false;
+      }
+    };
+    rec.onend = () => {
+      setMic(false); rec = null;
+      // Android ends recognition after each pause: keep going while the person is still trying.
+      if (wantListen && !done && Date.now() < listenUntil) setTimeout(startListening, 250);
+      else wantListen = false;
+    };
+    try { rec.start(); } catch (e) { setMic(false); }
+  }
+  function stopListening() { wantListen = false; if (rec) { try { rec.abort(); } catch (e) {} } }
+  $("mic").addEventListener("click", () => { if (listening) stopListening(); else startListening(); });
+
+  // ---------- Setup checks ----------
+  const installed = matchMedia("(display-mode: standalone)").matches || matchMedia("(display-mode: fullscreen)").matches;
+  $("c-install").textContent = installed ? "✓" : "✗";
+  $("c-install").className = "mark " + (installed ? "ok" : "bad");
+  $("t-install").textContent = installed ? "האפליקציה מותקנת במסך הבית." : "עוד לא במסך הבית: בתפריט של Chrome (⋮) בחר \"הוספה למסך הבית\" או \"התקנת אפליקציה\".";
+  $("c-speech").textContent = Rec ? "✓" : "✗";
+  $("c-speech").className = "mark " + (Rec ? "ok" : "bad");
+  $("t-speech").textContent = Rec ? "זיהוי דיבור זמין. לחץ \"בדוק מיקרופון\" ואשר גישה, כדי שבבוקר זה יעבוד מיד." : "זיהוי דיבור לא זמין בדפדפן הזה. פתח את האתר ב-Chrome.";
+  $("mic-test").addEventListener("click", () => {
+    if (!Rec) { $("mic-result").textContent = "זיהוי דיבור לא זמין. פתח ב-Chrome."; return; }
+    const r = new Rec(); r.lang = "he-IL"; r.interimResults = false;
+    $("mic-result").textContent = "אמור משהו בעברית…";
+    r.onresult = (e) => { $("mic-result").textContent = "שמעתי: " + e.results[0][0].transcript + " ✓"; };
+    r.onerror = (e) => { $("mic-result").textContent = e.error === "not-allowed" ? "הגישה למיקרופון נחסמה. אפשר אותה בהגדרות האתר ב-Chrome." : "לא שמעתי. נסה שוב."; };
+    try { r.start(); } catch (e) {}
+  });
+})();
+</script>
+</body>
+</html>
